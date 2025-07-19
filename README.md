@@ -1,450 +1,86 @@
-\# APC Network Management Card Firmware Upgrade
+# APC Network Management Card Firmware Upgrade
 
+This project automates firmware upgrades for APC Network Management Cards using Python and WinSCP. It uploads AOS and SUMX binaries, monitors reboots, and saves logs.
 
-
-This repository contains scripts and batch files to automate upgrading firmware on APC Network Management Cards (NMCs). It supports AOS and SUMX firmware upgrades, handling the upload, reboot detection, and logging.
-
-\# APC Network Management Card Firmware Upgrade
-
-
-
-This repository contains scripts and batch files to automate upgrading firmware on APC Network Management Cards (NMCs). It supports AOS and SUMX firmware upgrades, handling the upload, reboot detection, and logging.
-
-
-
----
-
-
-
-\## 📂 Directory Structure
-
-
-
-```text
-
-C:\\Temp\\Script
-
-├── apc\_hw05\_aos720\_sumx720\_bootmon109/    # Firmware bins folder
-
-│   └── Bins/
-
-│       ├── apc\_hw05\_aos\_720.bin
-
-│       ├── apc\_hw05\_bootmon\_109.bin
-
-│       └── apc\_hw05\_sumx\_720.bin
-
-├── Log/                                     # Upload logs (auto-created)
-
-├── credentials.json                         # FTP \& WinSCP settings
-
-├── device\_list.csv                          # List of target IPs
-
-├── update\_firmware.py                       # Main Python orchestrator
-
-├── aos\_bat.bat                              # WinSCP script for AOS
-
-└── sumx\_bat.bat                             # WinSCP script for SUMX
+## Directory Structure
 
 ```
+C:\Temp\Script
+├── apc_hw05_aos720_sumx720_bootmon109\   # Firmware directory (not in repo)
+│   └── Bins\
+├── Log\                                  # Upload logs
+├── aos_bat.bat                           # Upload AOS via WinSCP
+├── sumx_bat.bat                          # Upload SUMX via WinSCP
+├── credentials.json                      # FTP/Winscp config (ignored)
+├── credentials.example.json              # Public-safe config example
+├── device_list.csv                       # List of device IPs
+├── update_firmware.py                    # Main script
+├── README.md                             # Documentation
+└── .gitignore                            # Excludes sensitive files
+```
 
+## Setup
 
+### Requirements
 
----
+- Python 3.x
+- WinSCP installed with access to `winscp.com`
 
+### Configure credentials
 
-
-\## 🔧 Prerequisites
-
-
-
-1\. \*\*Operating System:\*\* Windows 10 or higher
-
-2\. \*\*Python:\*\* Version 3.x installed and on `%PATH%`
-
-3\. \*\*WinSCP:\*\* WinSCP CLI (`winscp.com`) installed (\[http://winscp.net](http://winscp.net)) and binary path available
-
-
-
----
-
-
-
-\## ⚙️ Configuration
-
-
-
-\### 1. `credentials.json`
-
-
-
-Store your FTP credentials and WinSCP path here:
-
-
+Create `credentials.json`:
 
 ```json
-
 {
-
-&nbsp; "ftp\_username": "YOUR\_FTP\_USERNAME",
-
-&nbsp; "ftp\_password": "YOUR\_FTP\_PASSWORD",
-
-&nbsp; "winscp\_com": "C:/Program Files/WinSCP/winscp.com"
-
+  "ftp_username": "username",
+  "ftp_password": "password",
+  "winscp_com": "C:\\Program Files (x86)\\WinSCP\\winscp.com"
 }
-
 ```
 
+This file is excluded from GitHub. An example is included as `credentials.example.json`.
 
+### Add devices
 
-\### 2. `device\_list.csv`
-
-
-
-A simple CSV listing one IP per line:
-
-
+Add IP addresses to `device_list.csv`:
 
 ```csv
-
 IP
-
 192.168.1.100
-
 192.168.1.101
-
-\# ...
-
 ```
 
+## Usage
 
+From PowerShell or CMD:
 
----
-
-
-
-\## 🚀 Usage
-
-
-
-1\. Open PowerShell or Command Prompt:
-
-
-
-&nbsp;  ```powershell
-
-&nbsp;  cd C:\\Temp\\Script
-
-&nbsp;  ```
-
-2\. Run the upgrade script:
-
-
-
-&nbsp;  ```powershell
-
-&nbsp;  python update\_firmware.py
-
-&nbsp;  ```
-
-
+```
+cd C:\Temp\Script
+python update_firmware.py
+```
 
 The script will:
 
+1. Upload AOS firmware using `aos_bat.bat`
+2. Wait for the device to reboot
+3. Upload SUMX firmware using `sumx_bat.bat`
+4. Save logs to the `Log\` directory
 
+## Batch File Parameters
 
-\* Read each IP from `device\_list.csv`.
-
-\* Call `aos\_bat.bat` to upload the AOS firmware.
-
-\* Wait for the card to reboot (offline → online).
-
-\* Call `sumx\_bat.bat` to upload the SUMX firmware.
-
-\* Write WinSCP output logs to `Log/{IP}\_{TAG}.txt`.
-
-
-
----
-
-
-
-\## 📄 Batch Files
-
-
-
-Both batch files accept the same parameters:
-
-
-
-```text
-
-Usage: <batch\_file> <ip> <ftp\_user> <ftp\_pass> <winscp\_com> <firmware\_file> <log\_file>
+Both batch files are called by Python and accept:
 
 ```
-
-
-
-\* \*\*`aos\_bat.bat`\*\* — Uploads the AOS firmware image.
-
-\* \*\*`sumx\_bat.bat`\*\* — Uploads the SUMX firmware image.
-
-
-
-They execute WinSCP in scripting mode, using `option batch abort` and `option confirm off`.
-
-
-
----
-
-
-
-\## 📜 Logging
-
-
-
-All WinSCP session output is captured in the `Log` directory. Files are named:
-
-
-
+<ip> <ftp_user> <ftp_pass> <winscp_com_path> <firmware_file_path> <log_file_path>
 ```
 
-{IP}\_AOS.txt
+## Tested Environment
 
-{IP}\_SUMX.txt
+- Windows 11
+- Python 3.11+
+- WinSCP 6.x
+- APC NMC AP9630 / AP9631 (v7.2.0 firmware)
 
-```
+## License
 
-
-
----
-
-
-
-\## ⚖️ License
-
-
-
-This project is released under the MIT License. See `LICENSE` for details.
-
-
-
----
-
-
-
-\## 📂 Directory Structure
-
-
-
-```text
-
-C:\\Temp\\Script
-
-├── apc\_hw05\_aos720\_sumx720\_bootmon109/    # Firmware bins folder
-
-│   └── Bins/
-
-│       ├── apc\_hw05\_aos\_720.bin
-
-│       ├── apc\_hw05\_bootmon\_109.bin
-
-│       └── apc\_hw05\_sumx\_720.bin
-
-├── Log/                                     # Upload logs (auto-created)
-
-├── credentials.json                         # FTP \& WinSCP settings
-
-├── device\_list.csv                          # List of target IPs
-
-├── update\_firmware.py                       # Main Python orchestrator
-
-├── aos\_bat.bat                              # WinSCP script for AOS
-
-└── sumx\_bat.bat                             # WinSCP script for SUMX
-
-```
-
-
-
----
-
-
-
-\## 🔧 Prerequisites
-
-
-
-1\. \*\*Operating System:\*\* Windows 10 or higher
-
-2\. \*\*Python:\*\* Version 3.x installed and on `%PATH%`
-
-3\. \*\*WinSCP:\*\* WinSCP CLI (`winscp.com`) installed (\[http://winscp.net](http://winscp.net)) and binary path available
-
-
-
----
-
-
-
-\## ⚙️ Configuration
-
-
-
-\### 1. `credentials.json`
-
-
-
-Store your FTP credentials and WinSCP path here:
-
-
-
-```json
-
-{
-
-&nbsp; "ftp\_username": "YOUR\_FTP\_USERNAME",
-
-&nbsp; "ftp\_password": "YOUR\_FTP\_PASSWORD",
-
-&nbsp; "winscp\_com": "C:/Program Files/WinSCP/winscp.com"
-
-}
-
-```
-
-
-
-\### 2. `device\_list.csv`
-
-
-
-A simple CSV listing one IP per line:
-
-
-
-```csv
-
-IP
-
-192.168.1.100
-
-192.168.1.101
-
-\# ...
-
-```
-
-
-
----
-
-
-
-\## 🚀 Usage
-
-
-
-1\. Open PowerShell or Command Prompt:
-
-
-
-&nbsp;  ```powershell
-
-&nbsp;  cd C:\\Temp\\Script
-
-&nbsp;  ```
-
-2\. Run the upgrade script:
-
-
-
-&nbsp;  ```powershell
-
-&nbsp;  python update\_firmware.py
-
-&nbsp;  ```
-
-
-
-The script will:
-
-
-
-\* Read each IP from `device\_list.csv`.
-
-\* Call `aos\_bat.bat` to upload the AOS firmware.
-
-\* Wait for the card to reboot (offline → online).
-
-\* Call `sumx\_bat.bat` to upload the SUMX firmware.
-
-\* Write WinSCP output logs to `Log/{IP}\_{TAG}.txt`.
-
-
-
----
-
-
-
-\## 📄 Batch Files
-
-
-
-Both batch files accept the same parameters:
-
-
-
-```text
-
-Usage: <batch\_file> <ip> <ftp\_user> <ftp\_pass> <winscp\_com> <firmware\_file> <log\_file>
-
-```
-
-
-
-\* \*\*`aos\_bat.bat`\*\* — Uploads the AOS firmware image.
-
-\* \*\*`sumx\_bat.bat`\*\* — Uploads the SUMX firmware image.
-
-
-
-They execute WinSCP in scripting mode, using `option batch abort` and `option confirm off`.
-
-
-
----
-
-
-
-\## 📜 Logging
-
-
-
-All WinSCP session output is captured in the `Log` directory. Files are named:
-
-
-
-```
-
-{IP}\_AOS.txt
-
-{IP}\_SUMX.txt
-
-```
-
-
-
----
-
-
-
-\## ⚖️ License
-
-
-
-This project is released under the MIT License. See `LICENSE` for details.
-
-
-
+MIT License
