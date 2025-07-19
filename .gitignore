@@ -1,0 +1,20 @@
+# Ignore sensitive and system-specific files
+# Exclude credentials
+credentials.json
+
+# Exclude firmware files and folders
+apc_hw05_aos720_sumx720_bootmon109/
+
+# Exclude logs
+Log/
+
+# Exclude compiled Python files (optional best practice)
+__pycache__/
+*.pyc
+
+# Exclude backup files
+Log/
+*.log
+*.pyc
+__pycache__/
+*.bak
